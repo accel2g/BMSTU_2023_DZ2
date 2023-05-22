@@ -198,53 +198,6 @@ int ImageProcess::erosion(int srcImg) {
     return 0;
 }
 
-std::list<std::list<std::pair<int, int>>> ImageProcess::getListContours() {
-    std::list<std::list<std::pair<int, int>>> contours;
-    int dx[8] = {-1,-1,-1,0,0,1,1,1};
-    int dy[8] = {-1,0,1,-1,1,-1,0,1};
-    int sz = 0;
-    Img* img;
-    if (processedImg != nullptr) {
-        img = processedImg;
-    } else {
-        img = srcImg;
-    }
-    for (int i = 0; i < img->height; ++i) {
-        for (int j = 0; j < img->width; ++j) {
-            if (img->srcImg[i*img->width+j] == 255) {
-                std::list<std::pair<int, int>> contour;
-                int x = j;
-                int y = i;
-                int prev_x = -1;
-                int prev_y = -1;
-                while (x != j || y != i || prev_x == -1 || prev_y == -1) {
-                    contour.push_back({x, y});
-                    int mn = 256;
-                    int mn_dir = -1;
-                    for (int k = 0; k < 8; ++k) {
-                        int nx = x + dx[k];
-                        int ny = y + dy[k];
-                        if (nx < 0 || nx >= img->width || ny < 0 || ny >= img->height) {
-                            continue;
-                        }
-                        if (img->srcImg[ny*img->width+nx] < mn) {
-                            mn = img->srcImg[ny*img->width+nx];
-                            mn_dir = k;
-                        }
-                    }
-                    prev_x = x;
-                    prev_y = y;
-                    x += dx[mn_dir];
-                    y += dy[mn_dir];
-                }
-                contours.push_back(contour);
-                sz += contour.size();
-            }
-        }
-    }
-    return contours;
-}
-
 int ImageProcess::loadImgFromFile(const char *fileName, int format) {
     std::ifstream file;
     file.open(fileName, std::ios::in);
